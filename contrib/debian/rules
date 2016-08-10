@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+# export DH_VERBOSE := 1
+
+# Export variables
+export DESTDIR := debian/@NAME@
+
+override_dh_auto_clean:
+	rm -rf `ls -A | grep -v "debian"`
+	tar xf ../*.orig.tar.gz -C ..
+
+override_dh_auto_configure:
+
+override_dh_auto_build:
+
+override_dh_auto_test:
+
+override_dh_auto_install:
+	install -g 0 -o 0 -d $(DESTDIR)/usr/share/perl5/SBSS/
+	install -m644 src/@NAME@/lib/SBSS/Client.pm $(DESTDIR)/usr/share/perl5/SBSS
+
+# the SHA1 of dockerinit is important: don't strip it
+# also, Go has lots of problems with stripping, so just don't
+override_dh_strip:
+
+
+%:
+	dh $@
+

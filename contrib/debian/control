@@ -1,0 +1,10 @@
+Source: @NAME@
+Priority: extra
+Section: misc
+Build-Depends: debhelper (>= 9)
+Standards-Version: @VERSION@
+Maintainer: supar <paulrez@gmail.com>
+
+Package: @NAME@
+Architecture: all
+Description: module to communicate with SBSS API
