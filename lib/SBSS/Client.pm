@@ -2,7 +2,10 @@
 package SBSS::Client;
 
 use Moose;
+use MooseX::Types::Moose qw(Str);
+use MooseX::Types::Structured qw(Dict);
 use LWP::UserAgent;
+use HTTP::Cookies;
 use Scalar::Util 'reftype';
 use JSON::PP;
 use Digest::MD5 qw(md5 md5_hex);
@@ -18,13 +21,19 @@ has ua => (
 has [ 'username', 'password' ] => ( is => 'rw' );
 has authorized => ( is => 'rw', default => 0 );
 has agent => ( is => 'ro', lazy => 1, default => 'Sbss-Perl-Client');
+has apikey => ( is => 'ro', isa => Dict[ name => Str, value => Str] );
 
 sub BUILD {
 	my $self = shift;
-	$self->ua->cookie_jar( {} );
+
 	$self->ua->ssl_opts( verify_hostnames => 0 );
 	$self->ua->default_header('X-Requested-With' => 'XMLHttpRequest');
 	$self->ua->agent($self->agent());
+
+	if($self->apikey()) {
+		$self->set_api_key();
+
+	}
 };
 
 
@@ -75,11 +84,47 @@ sub json_decode {
 	return JSON::PP->new->utf8->allow_singlequote->allow_barekey->decode($content);
 }
 
+sub set_api_key {
+	my $self = shift;
+
+	my ($user) = split /:/, $self->apikey()->{value};
+	my $cookie = HTTP::Cookies->new();
+
+	if(!$user) {
+		$self->apikey(undef);
+		return;
+	}
+
+	$self->ua->default_header('X-Sbss-Auth' => $user);
+	$self->ua->cookie_jar($cookie);
+
+	$self->ua->add_handler( request_prepare => sub {
+		$self->add_cookie(@_);
+	}, m_header__x_sbss_auth => $user );
+}
+
+sub add_cookie {
+	my($self, $request, $ua, $h) = @_;
+
+	$ua->cookie_jar()->set_cookie(
+		0,
+		$self->apikey()->{name},
+		$self->apikey()->{value},
+		$request->uri->path, $request->uri->host
+	);
+
+	$ua->cookie_jar()->add_cookie_header($request);
+
+	return($request);
+}
+
 sub get {
 	my $self = shift;
 
-	if(!$self->authorized()) {
-		$self->login(@_);
+	if(!$self->apikey()) {
+		if(!$self->authorized()) {
+			$self->login(@_);
+		}
 	}
 
 	return $self->ua->get(@_);
@@ -88,8 +133,10 @@ sub get {
 sub post {
 	my $self = shift;
 
-	if(!$self->authorized()) {
-		$self->login(@_);
+	if(!$self->apikey()) {
+		if(!$self->authorized()) {
+			$self->login(@_);
+		}
 	}
 
 	return $self->ua->post(@_);
