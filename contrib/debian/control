@@ -1,10 +1,11 @@
 Source: @NAME@
 Priority: extra
-Section: misc
+Section: perl
 Build-Depends: debhelper (>= 9)
 Standards-Version: @VERSION@
 Maintainer: supar <paulrez@gmail.com>
 
 Package: @NAME@
 Architecture: all
+Depends: perl, libmoose-perl, libmoosex-types-perl, libmoosex-types-structured-perl, libjson-perl, libdigest-perl-md5-perl, libdigest-sha-perl
 Description: module to communicate with SBSS API
