@@ -1,3 +1,9 @@
+@NAME@ (1.1.0-1) unstable; urgency=low
+
+  * Authorize through API key.
+
+ -- supar <paulrez@gmail.com>  Thu, 1 Sep 2016 17:00:00 +0300
+
 @NAME@ (1.0.0-1) unstable; urgency=low
 
   * First release of SBSS client API.
