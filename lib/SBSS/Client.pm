@@ -125,6 +125,8 @@ sub get {
 		if(!$self->authorized()) {
 			$self->login(@_);
 		}
+	} else {
+		warn 'SBSS does not support GET requests with API key';
 	}
 
 	return $self->ua->get(@_);
