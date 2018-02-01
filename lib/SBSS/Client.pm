@@ -25,10 +25,12 @@ has apikey => ( is => 'ro', isa => Dict[ name => Str, value => Str] );
 
 sub BUILD {
 	my $self = shift;
+	my $cookie = HTTP::Cookies->new();
 
 	$self->ua->ssl_opts( verify_hostnames => 0 );
 	$self->ua->default_header('X-Requested-With' => 'XMLHttpRequest');
 	$self->ua->agent($self->agent());
+	$self->ua->cookie_jar($cookie);
 
 	if($self->apikey()) {
 		$self->set_api_key();
@@ -88,7 +90,6 @@ sub set_api_key {
 	my $self = shift;
 
 	my ($user) = split /:/, $self->apikey()->{value};
-	my $cookie = HTTP::Cookies->new();
 
 	if(!$user) {
 		$self->apikey(undef);
@@ -96,7 +97,6 @@ sub set_api_key {
 	}
 
 	$self->ua->default_header('X-Sbss-Auth' => $user);
-	$self->ua->cookie_jar($cookie);
 
 	$self->ua->add_handler( request_prepare => sub {
 		$self->add_cookie(@_);
