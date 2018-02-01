@@ -9,7 +9,7 @@ RUN apt-get update -y
 RUN apt-get upgrade -y
 RUN apt-get install -y  --no-install-recommends ca-certificates \
                         curl unzip locales \
-			libmoose-perl libjson-perl libdigest-perl-md5-perl libdigest-sha-perl \
+			libmoose-perl libjson-perl libdigest-perl \
 			libhttp-request-params-perl libtest-lwp-useragent-perl \
 			libmoosex-types-perl libmoosex-types-structured-perl \
                         vim \
